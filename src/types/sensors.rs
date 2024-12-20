@@ -1,4 +1,7 @@
 use msgpack_rpc::{message::Response, Utf8String, Value};
+use super::vector::Vector3;
+
+use super::quaternion::Quaternionr;
 
 #[derive(Debug, Clone, Copy)]
 pub enum ImageType {
@@ -90,5 +93,34 @@ impl ImageRequests {
     pub(crate) fn as_msgpack(&self) -> Value {
         let images = self.0.iter().cloned().map(|img| img.as_msgpack()).collect();
         Value::Array(images)
+    }
+}
+
+pub struct ImuData {
+    pub timestamp: u64,
+    pub orientation: Quaternionr,
+    pub angular_velocity: Vector3,
+    pub linear_acceleration: Vector3,
+}
+
+impl From<Response> for ImuData {
+    fn from(msgpack: Response) -> Self {
+        match msgpack.result {
+            Ok(res) => {
+                let payload: &Vec<(Value, Value)> = res.as_map().unwrap();
+                let timestamp: u64 = payload[0].1.as_u64().unwrap();
+                let orientation: Quaternionr = payload[1].1.to_owned().into();
+                let angular_velocity: Vector3 = payload[2].1.to_owned().into();
+                let linear_acceleration: Vector3 = payload[3].1.to_owned().into();
+
+                Self {
+                    timestamp,
+                    orientation,
+                    angular_velocity,
+                    linear_acceleration
+                }
+            }
+            Err(_) => panic!("Couldn't decode result from ImuData msgpack")
+        }
     }
 }

@@ -27,3 +27,19 @@ impl Vector3 {
         Value::Map(msg)
     }
 }
+
+impl From<Value> for Vector3 {
+    fn from(msgpack: Value) -> Self {
+        let mut points = vec![];
+        let payload: &Vec<(Value, Value)> = msgpack.as_map().unwrap();
+        for(_, v) in payload {
+            let p = v.as_f64().unwrap() as f32;
+            points.push(p);
+        }
+        Vector3 {
+            x: points[0],
+            y: points[1],
+            z: points[2],
+        }
+    }
+}

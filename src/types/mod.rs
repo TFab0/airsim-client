@@ -13,3 +13,5 @@ pub mod simulation;
 pub mod vector;
 pub mod weather;
 pub mod yaw_mode;
+pub mod sensors;
+pub mod quaternion;

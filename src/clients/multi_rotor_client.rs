@@ -11,6 +11,7 @@ use crate::types::multi_rotor_state::MultiRotorState;
 use crate::types::pose::{Orientation2, Orientation3, Position3, Velocity3};
 use crate::types::pwm::PWM;
 use crate::types::rc_data::RCData;
+use crate::types::sensors::ImuData;
 use crate::types::yaw_mode::YawMode;
 use crate::{error::NetworkResult, NetworkError};
 use crate::{CompressedImage, ImageType, LinearControllerGains, Path, RotorStates, Velocity2};
@@ -901,6 +902,15 @@ impl MultiRotorClient {
             .unary_rpc("getRotorStates".into(), Some(vec![Value::String(vehicle_name)]))
             .await
             .map(RotorStates::from)
+    }
+
+
+    pub async fn get_imu_data(&self, imu_name: Utf8String) -> NetworkResult<ImuData> {
+        let vehicle_name: Utf8String = self.vehicle_name.into();
+        self.airsim_client.unary_rpc("getImuData".into(), Some(vec![Value::String(imu_name), Value::String(vehicle_name)]))
+        .await
+        .map(ImuData::from)
+
     }
 
     /// Camera API
