@@ -11,7 +11,7 @@ use crate::types::multi_rotor_state::MultiRotorState;
 use crate::types::pose::{Orientation2, Orientation3, Position3, Velocity3};
 use crate::types::pwm::PWM;
 use crate::types::rc_data::RCData;
-use crate::types::sensors::ImuData;
+use crate::types::sensors::{BarometerData, DistanceSensorData, GpsData, ImuData, MagnetometerData};
 use crate::types::yaw_mode::YawMode;
 use crate::{error::NetworkResult, NetworkError};
 use crate::{CompressedImage, ImageType, LinearControllerGains, Path, RotorStates, Velocity2};
@@ -904,13 +904,52 @@ impl MultiRotorClient {
             .map(RotorStates::from)
     }
 
-
+    /// Get the IMU data of the multirotor vehicle.  States include orientation, angular velocity, and linear acceleration.
     pub async fn get_imu_data(&self, imu_name: Utf8String) -> NetworkResult<ImuData> {
         let vehicle_name: Utf8String = self.vehicle_name.into();
         self.airsim_client.unary_rpc("getImuData".into(), Some(vec![Value::String(imu_name), Value::String(vehicle_name)]))
         .await
         .map(ImuData::from)
+    }
 
+    /// Get the distance sensor data of the multirotor vehicle.  States include distance.
+    pub async fn get_dist_data(&self) -> NetworkResult<DistanceSensorData> {
+        let vehicle_name: Utf8String = self.vehicle_name.into();
+        let dist_name: Utf8String = "".to_string().into();
+        self.airsim_client
+            .unary_rpc("getDistanceSensorData".into(), Some(vec![Value::String(dist_name), Value::String(vehicle_name)]))
+            .await
+            .map(DistanceSensorData::from)
+    }
+
+    /// Get the magnetometer data of the multirotor vehicle.  States include magnetic field.
+    pub async fn get_magnetometer_data(&self) -> NetworkResult<MagnetometerData> {
+        let vehicle_name: Utf8String = self.vehicle_name.into();
+        let magnetometer_name: Utf8String = "".to_string().into();
+        self.airsim_client
+            .unary_rpc("getMagnetometerData".into(), Some(vec![Value::String(magnetometer_name), Value::String(vehicle_name)]))
+            .await
+            .map(MagnetometerData::from)
+    }
+
+    /// Get the barometer data of the multirotor vehicle.  States include pressure, temperature, and relative altitude.
+    pub async fn get_barometer_data(&self) -> NetworkResult<BarometerData> {
+        let vehicle_name: Utf8String = self.vehicle_name.into();
+        let barometer_name: Utf8String = "".to_string().into();
+        self.airsim_client
+            .unary_rpc("getBarometerData".into(), Some(vec![Value::String(barometer_name), Value::String(vehicle_name)]))
+            .await
+            .map(BarometerData::from)
+    }
+
+    /// Get GPS data of the multirotor vehicle.  States include time, LLA, and is_valid
+    pub async fn get_gnss_data(&self) -> NetworkResult<GpsData> {
+        let vehicle_name: Utf8String = self.vehicle_name.into();
+        let gps_name: Utf8String = "".to_string().into();
+        self.airsim_client
+            .unary_rpc("getGpsData".into(), Some(vec![Value::String(gps_name), Value::String(vehicle_name)]))
+            .await
+            .map(GpsData::from)
     }
 
     /// Camera API

@@ -43,3 +43,9 @@ impl From<Value> for Vector3 {
         }
     }
 }
+impl From<Vector3> for nalgebra::SVector<f32, 3> {
+    fn from(vector: Vector3) -> Self {
+        nalgebra::SVector::<f32, 3>::new(vector.x, vector.y, vector.z)
+    }
+}
+

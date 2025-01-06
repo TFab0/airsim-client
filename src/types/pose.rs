@@ -149,6 +149,15 @@ impl From<Response> for Pose3 {
     }
 }
 
+impl From<Value> for Pose3 {
+    fn from(msgpack: Value) -> Self {
+        let payload: &Vec<(Value, Value)> = msgpack.as_map().unwrap();
+        let position: Position3 = payload[0].1.to_owned().into();
+        let orientation: Quaternion = payload[1].1.to_owned().into();
+        Self { position, orientation }
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct Orientation2 {
     /// roll angle, in radians

@@ -8,7 +8,7 @@ use std::sync::atomic::{AtomicU32, Ordering};
 
 use crate::{
     error::NetworkResult,
-    types::{geopoint::GeoPoint, pose::Pose3},
+    types::{environment::EnvironmentState, geopoint::GeoPoint, pose::Pose3},
     CompressedImage, ImageRequests, ImageType, MsgPackClient, NetworkError, SceneObjects, Vector3, WeatherParameter,
 };
 
@@ -452,6 +452,15 @@ impl AirsimClient {
         self.unary_rpc("getHomeGeoPoint".into(), Some(vec![Value::String(vehicle_name)]))
             .await
             .map(GeoPoint::from)
+    }
+
+    /// Get the environment state of the simulation
+    pub(crate) async fn get_environment_state(&self, vehicle_name: Option<&str>) -> Result<EnvironmentState, NetworkError> {
+        let vehicle_name: Utf8String = vehicle_name.unwrap_or("").into();
+
+        self.unary_rpc("getEnvironmentState".into(), Some(vec![Value::String(vehicle_name)]))
+            .await
+            .map(EnvironmentState::from)
     }
 
     /// Camera API

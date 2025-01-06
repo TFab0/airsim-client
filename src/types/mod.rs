@@ -15,3 +15,4 @@ pub mod weather;
 pub mod yaw_mode;
 pub mod sensors;
 pub mod quaternion;
+pub mod environment;
